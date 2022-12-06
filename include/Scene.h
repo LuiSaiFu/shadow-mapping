@@ -15,6 +15,7 @@
 
 #include "Camera.h"
 #include "SurfaceShader.h"
+#include "ShadowShader.h"
 #include "Light.h"
 #include "SpotLight.h"
 #include "Geometry.h"
@@ -36,8 +37,12 @@ class Scene {
 public:
 	int width, height;
     Camera* camera;
-    SurfaceShader* shader;
+    ShadowShader* shader;
 	SurfaceShader* depthShader;
+	
+	Shader* screenShader;
+	unsigned int quadVAO;
+
     // The following are containers of objects serving as the object palettes.
     // The containers store pointers so that they can also store derived class objects.
     std::map< std::string, Geometry* > geometry;
@@ -47,6 +52,10 @@ public:
     
     // The container of nodes will be the scene graph after we connect the nodes by setting the child_nodes.
     std::map< std::string, Node* > node;
+
+	unsigned int framebuffer;
+	unsigned int textureColorbuffer;
+	unsigned int rbo;
     
     Scene(){
         // the default scene graph already has one node named "world."

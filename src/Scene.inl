@@ -10,8 +10,6 @@ void Scene::init(int w, int h) {
 	width = w;
 	height = h;
 
-	SpotLight::staticInit();
-
     // Create a geometry palette
     geometry["cube"] = new Cube;
     geometry["teapot"] = new Obj;
@@ -79,16 +77,17 @@ void Scene::init(int w, int h) {
     model["bulb"]->material = material["bulb"];
     
     // Create a light palette
-    //light["sun"] = new SpotLight;
-    //light["sun"]->position = vec4(3.0f,2.0f,1.0f,0.0f);
-    //light["sun"]->color = 1.0f*vec4(1.0f,1.0f,1.0f,1.0f);
-	//light["sun"]->init();
+	/*
+    light["sun"] = new SpotLight;
+    light["sun"]->position = vec4(3.0f,2.0f,1.0f,0.0f);
+    light["sun"]->color = 1.0f*vec4(1.0f,1.0f,1.0f,1.0f);
+	light["sun"]->direction = vec4(1.0f, -1.0f, 0.0f, 0.0f);
+	*/
     
     light["bulb"] = new SpotLight;
     light["bulb"]->position = vec4(0.0f,2.0f,0.0f,1.0f);
     light["bulb"]->color = 1.5f * vec4(1.0f,0.2f,0.1f,1.0f);
-	light["bulb"]->direction = vec4(1.0f, 0.0f, 0.0f, 0.0f);
-	light["bulb"]->init();
+	light["bulb"]->direction = vec4(0.0f, -1.0f, 0.0f, 0.0f);
     
     // Build the scene graph
     node["table"] = new Node;
@@ -172,14 +171,78 @@ void Scene::init(int w, int h) {
     
     // Initialize shader
 	depthShader = new SurfaceShader;
-	depthShader->read_source("shaders/depth.vert", "shaders/empty.frag");
+	depthShader->read_source("shaders/depth.vert", "shaders/depth.frag");
 	depthShader->compile();
 	glUseProgram(depthShader->program);
 	depthShader->initUniforms();
 
-    shader = new SurfaceShader;
+	screenShader = new Shader;
+	screenShader->read_source("shaders/screen/screen.vert", "shaders/screen/screen.frag");
+	screenShader->compile();
+
+    shader = new ShadowShader;
     shader->read_source( "shaders/projective.vert", "shaders/lighting.frag" );
     shader->compile();
     glUseProgram(shader->program);
     shader->initUniforms();
+
+
+	// Initialize lights
+	SpotLight::staticInit(light.size());
+	for (std::pair<std::string, SpotLight*> entry : light)
+		entry.second->init();
+
+	// Initialize quadVAO
+	float quadVertices[] = {
+		// positions   // texCoords
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		-1.0f, -1.0f,  0.0f, 0.0f,
+		 1.0f, -1.0f,  1.0f, 0.0f,
+
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		 1.0f, -1.0f,  1.0f, 0.0f,
+		 1.0f,  1.0f,  1.0f, 1.0f
+	};
+	unsigned int indices[] = {
+		0, 1, 3,
+		1, 2, 3
+	};
+	unsigned int buffers[2];
+	glGenBuffers(2, &buffers[0]);
+	glGenVertexArrays(1, &quadVAO);
+	glBindVertexArray(quadVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2*sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	glBindVertexArray(0);
+
+	// Initialize screenbuffer
+	glGenFramebuffers(1, &framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+	glGenTextures(1, &textureColorbuffer);
+	glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
+
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

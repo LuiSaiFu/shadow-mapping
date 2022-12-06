@@ -3,6 +3,8 @@
 in vec4 position; // raw position in the model coord
 in vec3 normal;   // raw normal in the model coord
 
+in vec4 gl_FragCoord;
+
 uniform mat4 modelview; // from model coord to eye coord
 uniform mat4 view;      // from world coord to eye coord
 
@@ -20,9 +22,22 @@ uniform int nlights;
 uniform vec4 lightpositions[ maximal_allowed_lights ];
 uniform vec4 lightcolors[ maximal_allowed_lights ];
 
+
+uniform mat4 lightVP[ maximal_allowed_lights ];
+uniform sampler2DArray shadows;
+
 // Output the frag color
 out vec4 fragColor;
 
+float ShadowComputation(int ind, vec4 position)
+{
+	vec4 projP = lightVP[ind] * position;
+	projP = projP / projP.w;
+	projP = projP * 0.5 + 0.5;
+	float sDepth = texture(shadows, vec3(projP.xy, ind)).r;
+	float shadow = sDepth < projP.z ? 1.0f : 0.0f;
+	return shadow;
+}
 
 void main (void){
     if (!enablelighting){
@@ -38,9 +53,10 @@ void main (void){
 		vec4 R = vec4(emision);
 		for(int i = 0; i < nlights; i++)
 		{
+			float shadow = ShadowComputation(i, position);
 			vec3 l = normalize(lightpositions[i].xyz - P * lightpositions[i].w);
 			vec3 h = normalize(normalize(eye-P)+l);
-			R += (ambient + diffuse*max(dot(N,l),0) + specular*pow(max(dot(N,h),0),shininess)) * lightcolors[i];
+			R += (ambient + (diffuse*max(dot(N,l),0) + specular*pow(max(dot(N,h),0),shininess)) * (1.0f-shadow)) * lightcolors[i];
 		}
 		fragColor = R;
     }

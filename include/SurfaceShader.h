@@ -32,10 +32,10 @@ struct SurfaceShader : Shader {
     GLuint enablelighting_loc;
     GLuint nlights_loc;
     GLuint lightpositions_loc;
-    GLuint lightcolors_loc;
+	GLuint lightcolors_loc;
     
     
-    void initUniforms(){
+    virtual void initUniforms(){
         view_loc  = glGetUniformLocation( program, "view" );
         modelview_loc  = glGetUniformLocation( program, "modelview" );
         projection_loc = glGetUniformLocation( program, "projection" );
@@ -50,7 +50,7 @@ struct SurfaceShader : Shader {
         lightcolors_loc = glGetUniformLocation( program, "lightcolors" );
         
     }
-    void setUniforms(){
+	virtual void setUniforms(){
         glUniformMatrix4fv(view_loc, 1, GL_FALSE, &view[0][0]);
         glUniformMatrix4fv(modelview_loc, 1, GL_FALSE, &modelview[0][0]);
         glUniformMatrix4fv(projection_loc, 1, GL_FALSE, &projection[0][0]);

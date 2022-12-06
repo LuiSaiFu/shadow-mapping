@@ -6,6 +6,9 @@ layout (location = 1) in vec3 vertex_normal;
 uniform mat4 modelview;
 uniform mat4 projection;
 
+
+uniform int nlights;
+
 out vec4 position;
 out vec3 normal;
 

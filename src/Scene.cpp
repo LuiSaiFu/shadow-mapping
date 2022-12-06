@@ -36,7 +36,7 @@ void Scene::render(void) {
 		// draw all the models at the current node
 		for (size_t i = 0; i < cur->models.size(); i++) {
 			// Prepare to draw the geometry. Assign the modelview and the material.
-			shader->modelview = cur_VM * cur->modeltransforms[i]; // TODO: HW3: Without updating cur_VM, modelview would just be camera's view matrix.
+			shader->modelview = cur_VM * cur->modeltransforms[i];
 			shader->material = (cur->models[i])->material;
 
 			// The draw command
@@ -57,24 +57,51 @@ void Scene::draw(void){
     shader -> nlights = light.size();
     shader -> lightpositions.resize( shader -> nlights );
     shader -> lightcolors.resize( shader -> nlights );
+	shader->lightVP.resize(shader->nlights);
+
+	//First pass, depth buffer
+	glUseProgram(depthShader->program);
     int count = 0;
     for (std::pair<std::string, SpotLight*> entry : light){
-		shader->view = entry.second->view;
-		shader->projection = entry.second->proj;
-		entry.second->renderDepth();
+		depthShader->view = entry.second->view;
+		depthShader->projection = entry.second->proj;
+		entry.second->renderDepth(count);
+		//this->render();
+		shader->lightVP[count] = entry.second->proj * entry.second->view;
 
         shader -> lightpositions[ count ] = (entry.second) -> position;
         shader -> lightcolors[ count ] = (entry.second) -> color;
         count++;
     }
-
+	
+	//Second pass, draw to internal framebuffer
 	glViewport(0, 0, width, height);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glUseProgram(shader->program);
+
+	glBindTexture(GL_TEXTURE_2D_ARRAY, SpotLight::depthMap);
 
 	camera->computeMatrices();
 	shader->view = camera->view;
 	shader->projection = camera->proj;
 	this->render();
+	
+
+	//Third pass, draw to screen
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glUseProgram(screenShader->program);
+	glBindVertexArray(quadVAO);
+	glDisable(GL_DEPTH_TEST);
+	glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+	//glBindTexture(GL_TEXTURE_2D_ARRAY, SpotLight::depthMap);
+	//glBindTexture(GL_TEXTURE_2D, light.begin()->second->testDepthMap);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glEnable(GL_DEPTH_TEST);
 }
 
 

@@ -11,8 +11,9 @@
 #endif
 
 struct SpotLight {
-	const unsigned int WIDTH = 1024, HEIGHT = 1024;
+	const static unsigned int WIDTH = 1024, HEIGHT = 1024;
 	static unsigned int depthMapFBO;
+	static unsigned int depthMap;
 
 
 	glm::vec4 position = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
@@ -23,13 +24,16 @@ struct SpotLight {
 	float zNear = 0.01f;
 	float zFar  = 100.0f;
 
-	unsigned int depthMap;
 	glm::mat4 view;
 	glm::mat4 proj;
 
-	static void staticInit( void );
+	static void staticInit( int count );
 	void init( void );
-	void renderDepth( void );
+	void renderDepth( int layer );
+
+
+
+	unsigned int testDepthMap;
 };
 
 #endif 
