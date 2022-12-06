@@ -61,8 +61,10 @@ struct SurfaceShader : Shader {
         glUniform1fv( shininess_loc, 1, &(material -> shininess)   );
         glUniform1i( enablelighting_loc, enablelighting );
         glUniform1i( nlights_loc, nlights );
-        glUniform4fv( lightpositions_loc, GLsizei(nlights), &lightpositions[0][0] );
-        glUniform4fv( lightcolors_loc, GLsizei(nlights), &lightcolors[0][0] );
+		if(!lightpositions.empty())
+			glUniform4fv( lightpositions_loc, GLsizei(nlights), &lightpositions[0][0] );
+		if (!lightcolors.empty())
+			glUniform4fv( lightcolors_loc, GLsizei(nlights), &lightcolors[0][0] );
     }
 };
 

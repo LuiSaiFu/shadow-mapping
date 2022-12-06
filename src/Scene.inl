@@ -159,8 +159,9 @@ void Scene::init(int w, int h) {
 	node["world"]->childtransforms.push_back(translate(vec3(-1.8f, 0.75f, 0.0f)));
     node["world"]->childnodes.push_back( node["bunny"] );
     node["world"]->childtransforms.push_back( translate(vec3(-1.8f,0.0f,0.0f)) * rotate( 90.0f*float(M_PI)/180.0f, vec3(0.0f, 1.0f, 0.0f) ));
-    node["world"]->models.push_back( model["bulb"] );
-    node["world"]->modeltransforms.push_back( translate(vec3(0.0f,2.0f,0.0f))*scale(vec3(0.1f)) );
+   
+	//node["world"]->models.push_back( model["bulb"] );
+    //node["world"]->modeltransforms.push_back( translate(vec3(0.0f,2.0f,0.0f))*scale(vec3(0.1f)) );
     
     // Put a camera
     camera = new Camera;

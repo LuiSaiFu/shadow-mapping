@@ -2,6 +2,9 @@
 #include <glm/glm.hpp>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
+#include <vector>
+
+#include "Model.h"
 
 #ifndef __SPOTLIGHT_H__
 #define __SPOTLIGHT_H__
@@ -15,12 +18,11 @@ struct SpotLight {
 	static unsigned int depthMapFBO;
 	static unsigned int depthMap;
 
-
 	glm::vec4 position = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
 	glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	glm::vec4 direction = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
 
-	float light_angle = 30.0f;
+	float light_angle = 120.0f;
 	float zNear = 0.01f;
 	float zFar  = 100.0f;
 
@@ -29,7 +31,7 @@ struct SpotLight {
 
 	static void staticInit( int count );
 	void init( void );
-	void renderDepth( int layer );
+	void prepareRenderDepth( int layer );
 
 
 

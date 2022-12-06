@@ -23,8 +23,8 @@ void SpotLight::staticInit(int count) {
 }
 
 void SpotLight::init(void) {
-	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::vec3 Cez = glm::normalize(glm::vec3(-direction));
+	glm::vec3 up = glm::vec3(Cez.y, Cez.z, Cez.x);
 	glm::vec3 Cey = glm::normalize(up - glm::dot(Cez, up) * Cez);
 	glm::vec3 Cex = glm::cross(Cey, Cez);
 	glm::mat4 C;
@@ -42,30 +42,31 @@ void SpotLight::init(void) {
 		0.0f, 0.0f, -(zFar + zNear) / (zFar - zNear), -1.0f,
 		0.0f, 0.0f, -2.0f * zFar * zNear / (zFar - zNear), 0.0f);
 
+
+
 	glGenTextures(1, &testDepthMap);
 	glBindTexture(GL_TEXTURE_2D, testDepthMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
-		WIDTH, HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, WIDTH, HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
-void SpotLight::renderDepth(int layer) {
+void SpotLight::prepareRenderDepth(int layer) {
+	glViewport(0, 0, WIDTH, HEIGHT);
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-	
+	/*
 	glBindTexture(GL_TEXTURE_2D_ARRAY, depthMap);
 	glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthMap, 0, layer);
-	
-	/*
+	*/
+	///*
 	glBindTexture(GL_TEXTURE_2D, testDepthMap);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, testDepthMap, 0);
-	*/
+	//*/
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 
-	glViewport(0, 0, WIDTH, HEIGHT);
-	//glClearDepth(0.5f);
+	glClearDepth(1.0f);
 	glClear(GL_DEPTH_BUFFER_BIT);
 }

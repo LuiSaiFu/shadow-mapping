@@ -11,12 +11,12 @@ Scene.cpp contains the implementation of the draw command
 
 using namespace glm;
 
-void Scene::render(void) {
+void Scene::render(SurfaceShader* sha) {
 	std::stack < Node* > dfs_stack;
 	std::stack < mat4 >  matrix_stack;
 
 	Node* cur = node["world"];
-	mat4 cur_VM = camera->view;
+	mat4 cur_VM = sha->view;
 
 	dfs_stack.push(cur);
 	matrix_stack.push(cur_VM);
@@ -36,11 +36,11 @@ void Scene::render(void) {
 		// draw all the models at the current node
 		for (size_t i = 0; i < cur->models.size(); i++) {
 			// Prepare to draw the geometry. Assign the modelview and the material.
-			shader->modelview = cur_VM * cur->modeltransforms[i];
-			shader->material = (cur->models[i])->material;
+			sha->modelview = cur_VM * cur->modeltransforms[i];
+			sha->material = (cur->models[i])->material;
 
 			// The draw command
-			shader->setUniforms();
+			sha->setUniforms();
 			(cur->models[i])->geometry->draw();
 		}
 
@@ -57,7 +57,7 @@ void Scene::draw(void){
     shader -> nlights = light.size();
     shader -> lightpositions.resize( shader -> nlights );
     shader -> lightcolors.resize( shader -> nlights );
-	shader->lightVP.resize(shader->nlights);
+	shader -> lightVP.resize(shader->nlights);
 
 	//First pass, depth buffer
 	glUseProgram(depthShader->program);
@@ -65,14 +65,15 @@ void Scene::draw(void){
     for (std::pair<std::string, SpotLight*> entry : light){
 		depthShader->view = entry.second->view;
 		depthShader->projection = entry.second->proj;
-		entry.second->renderDepth(count);
-		//this->render();
+		entry.second->prepareRenderDepth(count);
+		this->render(depthShader);
 		shader->lightVP[count] = entry.second->proj * entry.second->view;
 
         shader -> lightpositions[ count ] = (entry.second) -> position;
         shader -> lightcolors[ count ] = (entry.second) -> color;
         count++;
     }
+	
 	
 	//Second pass, draw to internal framebuffer
 	glViewport(0, 0, width, height);
@@ -86,8 +87,11 @@ void Scene::draw(void){
 	camera->computeMatrices();
 	shader->view = camera->view;
 	shader->projection = camera->proj;
-	this->render();
+	//shader->view = light.begin()->second->view;
+	//shader->projection = light.begin()->second->proj;
+	this->render(shader);
 	
+
 
 	//Third pass, draw to screen
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -97,9 +101,9 @@ void Scene::draw(void){
 	glUseProgram(screenShader->program);
 	glBindVertexArray(quadVAO);
 	glDisable(GL_DEPTH_TEST);
-	glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+	//glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
 	//glBindTexture(GL_TEXTURE_2D_ARRAY, SpotLight::depthMap);
-	//glBindTexture(GL_TEXTURE_2D, light.begin()->second->testDepthMap);
+	glBindTexture(GL_TEXTURE_2D, light.begin()->second->testDepthMap);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glEnable(GL_DEPTH_TEST);
 }

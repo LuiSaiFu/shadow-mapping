@@ -64,7 +64,7 @@ public:
 
     void init( int w, int h );
     void draw( void );
-	void render( void );
+	void render(SurfaceShader* shader);
     
     // destructor
     ~Scene(){
