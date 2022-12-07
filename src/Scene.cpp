@@ -11,7 +11,7 @@ Scene.cpp contains the implementation of the draw command
 
 using namespace glm;
 
-void Scene::render(SurfaceShader* sha) {
+void Scene::render(SurfaceShader* sha, std::set<Model*>* ignore) {
 	std::stack < Node* > dfs_stack;
 	std::stack < mat4 >  matrix_stack;
 
@@ -35,6 +35,8 @@ void Scene::render(SurfaceShader* sha) {
 
 		// draw all the models at the current node
 		for (size_t i = 0; i < cur->models.size(); i++) {
+			if (ignore != nullptr && ignore->find(cur->models[i]) != ignore->end())
+				continue;
 			// Prepare to draw the geometry. Assign the modelview and the material.
 			sha->modelview = cur_VM * cur->modeltransforms[i];
 			sha->material = (cur->models[i])->material;
@@ -69,7 +71,7 @@ void Scene::draw(void){
 		depthShader->view = entry.second->view;
 		depthShader->projection = entry.second->proj;
 		entry.second->prepareRenderDepth(count);
-		this->render(depthShader);
+		this->render(depthShader, &(entry.second->ignore));
 
 		shader->lightVP[count] = entry.second->proj * entry.second->view;
 
@@ -91,7 +93,7 @@ void Scene::draw(void){
 	camera->computeMatrices();
 	shader->view = camera->view;
 	shader->projection = camera->proj;
-	this->render(shader);
+	this->render(shader, nullptr);
 	
 
 

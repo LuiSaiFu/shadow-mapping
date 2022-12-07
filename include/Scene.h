@@ -69,7 +69,7 @@ public:
 
     void init( int w, int h );
     void draw( void );
-	void render(SurfaceShader* shader);
+	void render(SurfaceShader* shader, std::set<Model*>* ignore);
     
     // destructor
     ~Scene(){

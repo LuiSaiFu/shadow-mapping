@@ -10,14 +10,13 @@ void SpotLight::staticInit(int count) {
 	
 	glGenTextures(1, &depthMap);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, depthMap);
-	//glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_DEPTH_COMPONENT, SpotLight::WIDTH, SpotLight::HEIGHT, count);
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT, SpotLight::WIDTH, SpotLight::HEIGHT, count, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
 
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+	float borderColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, borderColor);
 
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);

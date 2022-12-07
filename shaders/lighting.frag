@@ -49,13 +49,14 @@ vec4 DepthCompute(int ind, vec4 position)
 }
 ///DEBUG ONLY
 
-float ShadowComputation(int ind, vec4 position)
+float ShadowComputation(int ind, vec4 position, vec3 lightDir)
 {
 	vec4 projP = lightVP[ind] * position;
 	projP = projP / projP.w;
 	projP = projP * 0.5 + 0.5;
 	float sDepth = texture(shadows, vec3(projP.xy, ind)).r;
-	float shadow = sDepth < projP.z - 0.005f ? 1.0f : 0.0f;
+	float bias = max(0.002 * (1.0 - dot(normalize(normal), -lightDir)), 0.0002);
+	float shadow = sDepth < projP.z - bias ? 1.0f : 0.0f;
 	return shadow;
 }
 
@@ -73,10 +74,12 @@ void main (void){
 		vec4 R = vec4(emision);
 		for(int i = 0; i < nlights; i++)
 		{
-			float shadow = ShadowComputation(i, model * position);
-			vec3 l = normalize(lightpositions[i].xyz - P * lightpositions[i].w);
+			vec3 d = lightpositions[i].xyz - P * lightpositions[i].w;
+			vec3 l = normalize(d);
 			vec3 h = normalize(normalize(eye-P)+l);
-			R += (ambient + (diffuse*max(dot(N,l),0) + specular*pow(max(dot(N,h),0),shininess)) * (1.0f-shadow)) * lightcolors[i];
+			float shadow = ShadowComputation(i, model * position, l);
+			R += (ambient + (diffuse*max(dot(N,l),0) + specular*pow(max(dot(N,h),0),shininess)) * (1.0f-shadow)) * lightcolors[i] / sqrt(d.x*d.x+d.y*d.y+d.z*d.z);
+			//fragColor = vec4(vec3(shadow), 1.0f);
 		}
 		fragColor = R;
     }

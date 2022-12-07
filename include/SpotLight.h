@@ -2,7 +2,7 @@
 #include <glm/glm.hpp>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
-#include <vector>
+#include <set>
 
 #include "Model.h"
 
@@ -21,6 +21,7 @@ struct SpotLight {
 	glm::vec4 position = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
 	glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	glm::vec4 direction = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
+	std::set<Model*> ignore;
 
 	float light_angle = 120.0f;
 	float zNear = 0.01f;
