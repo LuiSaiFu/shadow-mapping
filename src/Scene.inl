@@ -77,12 +77,11 @@ void Scene::init(int w, int h) {
     model["bulb"]->material = material["bulb"];
     
     // Create a light palette
-	/*
+	///*
     light["sun"] = new SpotLight;
     light["sun"]->position = vec4(3.0f,2.0f,1.0f,0.0f);
-    light["sun"]->color = 1.0f*vec4(1.0f,1.0f,1.0f,1.0f);
-	light["sun"]->direction = vec4(1.0f, -1.0f, 0.0f, 0.0f);
-	*/
+    light["sun"]->color = 8.0f*vec4(1.0f,1.0f,1.0f,1.0f);
+	//*/
     
 	///*
     light["bulb"] = new SpotLight;
@@ -98,7 +97,7 @@ void Scene::init(int w, int h) {
 	///*
 	light["bulb2"] = new SpotLight;
 	light["bulb2"]->position = vec4(-1.5f, 1.5f, 1.0f, 1.0f);
-	light["bulb2"]->color = 4.5f * vec4(0.0f, 0.8f, 1.0f, 1.0f);
+	light["bulb2"]->color = 1.0f * vec4(0.0f, 0.8f, 1.0f, 1.0f);
 	light["bulb2"]->direction = vec4(1.0f, -1.0f, -1.0f, 0.0f);
 	light["bulb2"]->zFar = 5.0f;
 	light["bulb2"]->light_angle = 100.0f;

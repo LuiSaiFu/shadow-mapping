@@ -23,6 +23,11 @@ struct SpotLight {
 	glm::vec4 direction = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
 	std::set<Model*> ignore;
 
+	//For area lights/vector lights
+	float size = 2.0f;
+	float depth = 10.0f;
+
+	//For spot lights
 	float light_angle = 120.0f;
 	float zNear = 0.01f;
 	float zFar  = 1.0f;
@@ -33,10 +38,6 @@ struct SpotLight {
 	static void staticInit( int count );
 	void init( void );
 	void prepareRenderDepth( int layer );
-
-
-
-	unsigned int testDepthMap;
 };
 
 #endif 
