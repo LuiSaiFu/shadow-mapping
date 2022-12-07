@@ -25,7 +25,7 @@ struct SpotLight {
 
 	//For area lights/vector lights
 	float size = 2.0f;
-	float depth = 10.0f;
+	float depth = 2.0f;
 
 	//For spot lights
 	float light_angle = 120.0f;
