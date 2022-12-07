@@ -26,8 +26,28 @@ uniform vec4 lightcolors[ maximal_allowed_lights ];
 uniform mat4 lightVP[ maximal_allowed_lights ];
 uniform sampler2DArray shadows;
 
+
 // Output the frag color
 out vec4 fragColor;
+
+///DEBUG ONLY
+float near = 0.01f;
+float far = 1.0f;
+float LinearizeDepth(float depth)
+{
+    float z = depth * 2.0 - 1.0; // Back to NDC 
+    return (2.0 * near * far) / (far + near - z * (far - near));
+}
+vec4 DepthCompute(int ind, vec4 position)
+{
+	vec4 projP = lightVP[ind] * position;
+	projP = projP / projP.w;
+	projP = projP * 0.5 + 0.5;
+	float sDepth = texture(shadows, vec3(projP.xy, ind)).r;
+	vec4 c = vec4(vec3(LinearizeDepth(sDepth) / far), 1.0f);
+	return c;
+}
+///DEBUG ONLY
 
 float ShadowComputation(int ind, vec4 position)
 {
@@ -35,7 +55,7 @@ float ShadowComputation(int ind, vec4 position)
 	projP = projP / projP.w;
 	projP = projP * 0.5 + 0.5;
 	float sDepth = texture(shadows, vec3(projP.xy, ind)).r;
-	float shadow = sDepth < projP.z ? 1.0f : 0.0f;
+	float shadow = sDepth < projP.z - 0.005f ? 1.0f : 0.0f;
 	return shadow;
 }
 
@@ -53,7 +73,7 @@ void main (void){
 		vec4 R = vec4(emision);
 		for(int i = 0; i < nlights; i++)
 		{
-			float shadow = ShadowComputation(i, position);
+			float shadow = ShadowComputation(i, model * position);
 			vec3 l = normalize(lightpositions[i].xyz - P * lightpositions[i].w);
 			vec3 h = normalize(normalize(eye-P)+l);
 			R += (ambient + (diffuse*max(dot(N,l),0) + specular*pow(max(dot(N,h),0),shininess)) * (1.0f-shadow)) * lightcolors[i];

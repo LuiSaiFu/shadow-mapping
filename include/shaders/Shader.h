@@ -45,6 +45,10 @@ public:
     GLint getVertexShaderCompileStatus(){return compiled_vs;}
     GLint getFragmentShaderCompileStatus(){return compiled_fs;}
     GLint getLinkStatus(){return linked;}
+	void setInt(const std::string& name, int value) const
+	{
+		glUniform1i(glGetUniformLocation(program, name.c_str()), value);
+	}
     
 private:
     // Helper functions

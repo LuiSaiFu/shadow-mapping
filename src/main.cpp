@@ -84,10 +84,14 @@ void keyboard(unsigned char key, int x, int y){
             scene.camera -> zoom(1.1f);
             glutPostRedisplay();
             break;
-        case 'l':
-            scene.shader -> enablelighting = !(scene.shader -> enablelighting);
+        case 'l':scene.shader -> enablelighting = !(scene.shader -> enablelighting);
             glutPostRedisplay();
             break;
+		case 's':
+			if (scene.light.size() > 0)
+				scene.renderDepth = !(scene.renderDepth);
+			glutPostRedisplay();
+			break;
         case ' ':
             hw3AutoScreenshots();
             glutPostRedisplay();
@@ -96,6 +100,11 @@ void keyboard(unsigned char key, int x, int y){
             glutPostRedisplay();
             break;
     }
+}
+int max(int a, int b) {
+	if (a > b)
+		return a;
+	return b;
 }
 void specialKey(int key, int x, int y){
     switch (key) {
@@ -108,11 +117,22 @@ void specialKey(int key, int x, int y){
             glutPostRedisplay();
             break;
         case GLUT_KEY_RIGHT: // right
-            scene.camera -> rotateRight(-10.0f);
+			if (scene.renderDepth)
+			{
+				scene.lightInd = (scene.lightInd + 1) % max(1, scene.light.size());
+			}
+			else
+	            scene.camera -> rotateRight(-10.0f);
             glutPostRedisplay();
             break;
         case GLUT_KEY_LEFT: // left
-            scene.camera -> rotateRight(10.0f);
+			if (scene.renderDepth)
+			{
+				int len = max(1, scene.light.size());
+				scene.lightInd = (scene.lightInd - 1 + len) % len;
+			}
+			else
+				scene.camera -> rotateRight(10.0f);
             glutPostRedisplay();
             break;
     }

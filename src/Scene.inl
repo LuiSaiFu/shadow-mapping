@@ -84,11 +84,22 @@ void Scene::init(int w, int h) {
 	light["sun"]->direction = vec4(1.0f, -1.0f, 0.0f, 0.0f);
 	*/
     
+	///*
     light["bulb"] = new SpotLight;
     light["bulb"]->position = vec4(0.0f,2.0f,0.0f,1.0f);
-    light["bulb"]->color = 1.5f * vec4(1.0f,0.2f,0.1f,1.0f);
+    light["bulb"]->color = 2.0f * vec4(1.0f,0.8f,0.6f,1.0f);
 	light["bulb"]->direction = vec4(0.0f, -1.0f, 0.0f, 0.0f);
-    
+	//*/
+
+	/*
+	light["bulb2"] = new SpotLight;
+	light["bulb2"]->position = vec4(0.0f, 4.0f, 2.0f, 1.0f);
+	light["bulb2"]->color = 1.0f * vec4(0.0f, 0.8f, 1.0f, 1.0f);
+	light["bulb2"]->direction = vec4(0.0f, -1.0f, -1.0f, 0.0f);
+	light["bulb2"]->zFar = 5.0f;
+	light["bulb2"]->light_angle = 90.0f;
+    */
+
     // Build the scene graph
     node["table"] = new Node;
     node["table top"] = new Node;
@@ -177,14 +188,24 @@ void Scene::init(int w, int h) {
 	glUseProgram(depthShader->program);
 	depthShader->initUniforms();
 
-	screenShader = new Shader;
+	screenShader = new ScreenShader;
 	screenShader->read_source("shaders/screen/screen.vert", "shaders/screen/screen.frag");
 	screenShader->compile();
+	screenShader->initUniforms();
+	screenShader->setInt("screenTexture", 0);
+
+	depthScreenShader = new ScreenShader;
+	depthScreenShader->read_source("shaders/screen/screen.vert", "shaders/screen/depthScreen.frag");
+	depthScreenShader->compile();
+	depthScreenShader->initUniforms();
+	depthScreenShader->setInt("shadows", 0);
+
 
     shader = new ShadowShader;
-    shader->read_source( "shaders/projective.vert", "shaders/lighting.frag" );
+    shader->read_source("shaders/projective.vert", "shaders/lighting.frag");
     shader->compile();
     glUseProgram(shader->program);
+	depthShader->setInt("shadows", 1);
     shader->initUniforms();
 
 

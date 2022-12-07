@@ -14,8 +14,9 @@
 #include <stack>
 
 #include "Camera.h"
-#include "SurfaceShader.h"
-#include "ShadowShader.h"
+#include "shaders/SurfaceShader.h"
+#include "shaders/ShadowShader.h"
+#include "shaders/ScreenShader.h"
 #include "Light.h"
 #include "SpotLight.h"
 #include "Geometry.h"
@@ -35,12 +36,16 @@ public:
 
 class Scene {
 public:
+	bool renderDepth = false;
+	int lightInd = 0;
+
 	int width, height;
     Camera* camera;
     ShadowShader* shader;
 	SurfaceShader* depthShader;
 	
-	Shader* screenShader;
+	ScreenShader* screenShader;
+	ScreenShader* depthScreenShader;
 	unsigned int quadVAO;
 
     // The following are containers of objects serving as the object palettes.

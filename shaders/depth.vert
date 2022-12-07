@@ -1,10 +1,10 @@
 #version 330 core
-layout (location = 0) in vec3 aPos;
+layout (location = 0) in vec3 vertex_position;
 
-uniform mat4 lightSpaceMatrix;
-uniform mat4 model;
+uniform mat4 modelview;
+uniform mat4 projection;
 
 void main()
 {
-    gl_Position = lightSpaceMatrix * model * vec4(aPos, 1.0);
+    gl_Position = projection * modelview * vec4(vertex_position, 1.0);
 } 

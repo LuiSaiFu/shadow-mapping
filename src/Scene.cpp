@@ -61,12 +61,16 @@ void Scene::draw(void){
 
 	//First pass, depth buffer
 	glUseProgram(depthShader->program);
+	SpotLight* currLight = nullptr;
     int count = 0;
     for (std::pair<std::string, SpotLight*> entry : light){
+		if (count == lightInd)
+			currLight = entry.second;
 		depthShader->view = entry.second->view;
 		depthShader->projection = entry.second->proj;
 		entry.second->prepareRenderDepth(count);
 		this->render(depthShader);
+
 		shader->lightVP[count] = entry.second->proj * entry.second->view;
 
         shader -> lightpositions[ count ] = (entry.second) -> position;
@@ -78,32 +82,44 @@ void Scene::draw(void){
 	//Second pass, draw to internal framebuffer
 	glViewport(0, 0, width, height);
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(shader->program);
 
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, SpotLight::depthMap);
 
 	camera->computeMatrices();
 	shader->view = camera->view;
 	shader->projection = camera->proj;
-	//shader->view = light.begin()->second->view;
-	//shader->projection = light.begin()->second->proj;
 	this->render(shader);
 	
 
 
 	//Third pass, draw to screen
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glUseProgram(screenShader->program);
+	if (renderDepth)
+	{
+		depthScreenShader = depthScreenShader;
+		depthScreenShader->ind = lightInd;
+		depthScreenShader->far_dist = currLight->zFar;
+		depthScreenShader->near_dist = currLight->zNear;
+
+		glUseProgram(depthScreenShader->program);
+		depthScreenShader->setUniforms();
+	}
+	else
+	{
+		glUseProgram(screenShader->program);
+		screenShader->setUniforms();
+	}
+
 	glBindVertexArray(quadVAO);
 	glDisable(GL_DEPTH_TEST);
-	//glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-	//glBindTexture(GL_TEXTURE_2D_ARRAY, SpotLight::depthMap);
-	glBindTexture(GL_TEXTURE_2D, light.begin()->second->testDepthMap);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, SpotLight::depthMap);
+	glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glEnable(GL_DEPTH_TEST);
 }

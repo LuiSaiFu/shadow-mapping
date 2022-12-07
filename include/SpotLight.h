@@ -24,7 +24,7 @@ struct SpotLight {
 
 	float light_angle = 120.0f;
 	float zNear = 0.01f;
-	float zFar  = 100.0f;
+	float zFar  = 1.0f;
 
 	glm::mat4 view;
 	glm::mat4 proj;
