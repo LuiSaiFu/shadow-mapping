@@ -36,6 +36,7 @@ public:
 
 class Scene {
 public:
+	float t;
 	bool renderDepth = false;
 	int lightInd = 0;
 

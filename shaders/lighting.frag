@@ -54,11 +54,7 @@ float ShadowComputation(int ind, vec4 position, vec3 lightDir)
 	vec4 projP = lightVP[ind] * position;
 	projP = projP / projP.w;
 	projP = projP * 0.5 + 0.5;
-	float bias = max(0.002 * (1.0 - dot(normalize(normal), -lightDir)), 0.0002);
-	/*
-	float sDepth = texture(shadows, vec3(projP.xy, ind)).r;
-	float shadow = sDepth  ? 1.0f : 0.0f;
-	*/
+	float bias = max(0.008 * (1.0 - dot(normalize(normal), -lightDir)), 0.005);
 	float shadow = 0.0;
 	vec2 texelSize = 1.0 / vec2(textureSize(shadows, 0));
 	for(int x = -1; x <= 1; ++x)

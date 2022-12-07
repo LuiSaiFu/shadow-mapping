@@ -5,10 +5,15 @@ Scene.cpp contains the implementation of the draw command
 #include "Cube.h"
 #include "Obj.h"
 
-// The scene init definition 
-//#include "Scene.inl"
+// The scene init definition
 
+#define SCENE 2
+
+#if SCENE == 1
+#include "Scene.inl"
+#elif SCENE == 2
 #include "Scene2.inl"
+#endif
 
 
 using namespace glm;
@@ -126,6 +131,15 @@ void Scene::draw(void){
 	glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glEnable(GL_DEPTH_TEST);
+
+	t += 1.0f;
+
+	#if SCENE == 2
+	node["world"]->modeltransforms.pop_back();
+	float a = t / 60;
+	node["world"]->modeltransforms.push_back(translate((-1.5f * vec3(glm::sin(a), 0.0f, glm::cos(a)-0.7f))) * rotate(a, vec3(0.0f, 1.0f, 0.0f)) * translate(vec3(0.0f, 1.0f, 1.5f)));
+	glutPostRedisplay();
+	#endif
 }
 
 

@@ -14,7 +14,7 @@
 #endif
 
 struct SpotLight {
-	const static unsigned int WIDTH = 1024, HEIGHT = 1024;
+	const static unsigned int WIDTH = 2048, HEIGHT = 2048;
 	static unsigned int depthMapFBO;
 	static unsigned int depthMap;
 
