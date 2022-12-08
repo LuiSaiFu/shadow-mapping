@@ -7,6 +7,7 @@ Scene.cpp contains the implementation of the draw command
 
 // The scene init definition
 
+//Choose Scene (1,2,3)
 #define SCENE 3
 
 #if SCENE == 1
