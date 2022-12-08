@@ -109,11 +109,11 @@ int max(int a, int b) {
 void specialKey(int key, int x, int y){
     switch (key) {
         case GLUT_KEY_UP: // up
-            scene.camera -> rotateUp(-10.0f);
+            scene.camera -> rotateUp(-5.0f);
             glutPostRedisplay();
             break;
         case GLUT_KEY_DOWN: // down
-            scene.camera -> rotateUp(10.0f);
+            scene.camera -> rotateUp(5.0f);
             glutPostRedisplay();
             break;
         case GLUT_KEY_RIGHT: // right
@@ -122,7 +122,7 @@ void specialKey(int key, int x, int y){
 				scene.lightInd = (scene.lightInd + 1) % max(1, scene.light.size());
 			}
 			else
-	            scene.camera -> rotateRight(-10.0f);
+	            scene.camera -> rotateRight(-5.0f);
             glutPostRedisplay();
             break;
         case GLUT_KEY_LEFT: // left
@@ -132,7 +132,7 @@ void specialKey(int key, int x, int y){
 				scene.lightInd = (scene.lightInd - 1 + len) % len;
 			}
 			else
-				scene.camera -> rotateRight(10.0f);
+				scene.camera -> rotateRight(5.0f);
             glutPostRedisplay();
             break;
     }

@@ -7,12 +7,14 @@ Scene.cpp contains the implementation of the draw command
 
 // The scene init definition
 
-#define SCENE 2
+#define SCENE 3
 
 #if SCENE == 1
 #include "Scene.inl"
 #elif SCENE == 2
 #include "Scene2.inl"
+#elif SCENE == 3
+#include "Scene3.inl"
 #endif
 
 
@@ -131,15 +133,19 @@ void Scene::draw(void){
 	glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glEnable(GL_DEPTH_TEST);
+	
 
+#if SCENE == 2 || SCENE == 3
 	t += 1.0f;
-
-	#if SCENE == 2
 	node["world"]->modeltransforms.pop_back();
-	float a = t / 60;
+	float a = t / 80;
+	#if SCENE == 2
 	node["world"]->modeltransforms.push_back(translate((-1.5f * vec3(glm::sin(a), 0.0f, glm::cos(a)-0.7f))) * rotate(a, vec3(0.0f, 1.0f, 0.0f)) * translate(vec3(0.0f, 1.0f, 1.5f)));
-	glutPostRedisplay();
+	#else
+	node["world"]->modeltransforms.push_back(scale(vec3(0.5f, 0.5f, 0.5f)) * translate(vec3(0.0f, 0.0f, 2.0f)) * rotate(float(M_PI) / 2 + a, vec3(0.0f, 1.0f, 0.0f)));
 	#endif
+	glutPostRedisplay();
+#endif
 }
 
 

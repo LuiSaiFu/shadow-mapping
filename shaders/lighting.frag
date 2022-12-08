@@ -54,15 +54,17 @@ float ShadowComputation(int ind, vec4 position, vec3 lightDir)
 	vec4 projP = lightVP[ind] * position;
 	projP = projP / projP.w;
 	projP = projP * 0.5 + 0.5;
-	float bias = max(0.008 * (1.0 - dot(normalize(normal), -lightDir)), 0.005);
+	float bias = max(0.009 * (1.0 - dot(normalize(normal), -lightDir)), 0.005);
 	float shadow = 0.0;
 	vec2 texelSize = 1.0 / vec2(textureSize(shadows, 0));
 	for(int x = -1; x <= 1; ++x)
 	{
 		for(int y = -1; y <= 1; ++y)
 		{
-			float pcfDepth = texture(shadows, vec3(projP.xy + vec2(x, y) * texelSize, ind)).r; 
-			shadow += pcfDepth < projP.z - bias ? 1.0 : 0.0;        
+			float pcfDepth = texture(shadows, vec3(projP.xy + vec2(x, y) * texelSize, ind)).r;
+			//Prevent light appearing behind light source due to shadow bias
+			if(pcfDepth != 0.0f)
+				shadow += pcfDepth < projP.z - bias ? 1.0 : 0.0;        
 		}    
 	}
 	shadow /= 9.0;

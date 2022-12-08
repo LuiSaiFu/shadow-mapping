@@ -12,10 +12,8 @@ void Scene::init(int w, int h) {
 
     // Create a geometry palette
     geometry["cube"] = new Cube;
-    geometry["teapot"] = new Obj;
     geometry["bunny"] = new Obj;
     geometry["cube"]->init();
-    geometry["teapot"]->init("models/teapot.obj");
     geometry["bunny"]->init("models/bunny.obj");
     
     // Create a material palette    
